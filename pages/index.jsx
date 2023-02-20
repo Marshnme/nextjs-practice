@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import MeetupList from '../components/meetups/MeetupList';
 
 const DUMMY = [
@@ -32,17 +31,25 @@ const DUMMY = [
 	},
 ];
 
-const HomePage = () => {
-	const [meetups, setMeetups] = useState([]);
-	useEffect(() => {
-		// send an http request and setMeetups to data
-		setMeetups(DUMMY);
-	}, []);
+const HomePage = ({ meetups }) => {
 	return (
 		<>
 			<MeetupList meetups={meetups} />
 		</>
 	);
 };
+
+export async function getStaticProps() {
+	// fetch data from API
+	// anything you want, this function never runs on the client machine, only during build
+	// always return object in getStaticProps
+	return {
+		props: {
+			meetups: DUMMY,
+		},
+		// updates every 10 seconds if there is new data coming in
+		revalidate: 10,
+	};
+}
 
 export default HomePage;
