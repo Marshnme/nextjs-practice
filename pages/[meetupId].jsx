@@ -24,7 +24,7 @@ export async function getStaticPaths() {
 		// fallback to false will render 404 if a user went to /m5.
 		// if fallback was set to true, it would render the /m5 even if the path isnt defined. So, if you have 100s of pages, you can set your most popular pages in the paths array for fast loading, then render the other pages once the user requests the path
 
-		fallback: false,
+		fallback: true,
 		paths: [
 			{
 				params: {

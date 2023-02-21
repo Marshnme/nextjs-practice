@@ -1,35 +1,5 @@
 import MeetupList from '../components/meetups/MeetupList';
-
-const DUMMY = [
-	{
-		id: 'm1',
-		title: 'Event1',
-		image: 'https://static01.nyt.com/images/2022/12/20/science/16tb-cinnamon-bear/16tb-cinnamon-bear-articleLarge.jpg?quality=75&auto=webp',
-		address: '4321 address',
-		description: 'first meetup!!',
-	},
-	{
-		id: 'm2',
-		title: 'Event2',
-		image: 'https://static01.nyt.com/images/2022/12/20/science/16tb-cinnamon-bear/16tb-cinnamon-bear-articleLarge.jpg?quality=75&auto=webp',
-		address: '3453 address',
-		description: 'first meetup!!',
-	},
-	{
-		id: 'm3',
-		title: 'Event3',
-		image: 'https://static01.nyt.com/images/2022/12/20/science/16tb-cinnamon-bear/16tb-cinnamon-bear-articleLarge.jpg?quality=75&auto=webp',
-		address: '3123 address',
-		description: 'first meetup!!',
-	},
-	{
-		id: 'm4',
-		title: 'Event4',
-		image: 'https://static01.nyt.com/images/2022/12/20/science/16tb-cinnamon-bear/16tb-cinnamon-bear-articleLarge.jpg?quality=75&auto=webp',
-		address: '4564 address',
-		description: 'first meetup!!',
-	},
-];
+import { MongoClient } from 'mongodb';
 
 const HomePage = ({ meetups }) => {
 	return (
@@ -56,9 +26,26 @@ export async function getStaticProps() {
 	// fetch data from API
 	// anything you want, this function never runs on the client machine, only during build
 	// always return object in getStaticProps
+	const client = await MongoClient.connect(
+		`mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASS}@nextjs-practice.7mziiho.mongodb.net/?retryWrites=true&w=majority`
+	);
+
+	const db = client.db();
+	const collection = db.collection('meetups');
+
+	const allMeetups = await collection.find().toArray();
+
+	client.close();
+
 	return {
 		props: {
-			meetups: DUMMY,
+			meetups: allMeetups.map((meetup) => ({
+				title: meetup.title,
+				address: meetup.address,
+				image: meetup.image,
+				description: meetup.description,
+				id: meetup._id.toString(),
+			})),
 		},
 		// updates every 10 seconds if there is new data coming in
 		revalidate: 10,
