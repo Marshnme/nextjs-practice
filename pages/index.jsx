@@ -39,6 +39,19 @@ const HomePage = ({ meetups }) => {
 	);
 };
 
+// export async function getServerSideProps(context) {
+// 	// fetch whatever, always ran on server never on client
+// 	// you really only need to use this function over getStaticProps if you need access to the req/res or you truly have data updating multiple times every second
+// 	const req = context.req;
+// 	const res = context.res;
+
+// 	return {
+// 		props: {
+// 			meetups: DUMMY,
+// 		},
+// 	};
+// }
+
 export async function getStaticProps() {
 	// fetch data from API
 	// anything you want, this function never runs on the client machine, only during build
