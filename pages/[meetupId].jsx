@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import { MongoClient } from 'mongodb';
 import styles from '../styles/MeetupDetails.module.css';
 
 const MeetupDetails = ({ meetupData }) => {
@@ -20,33 +21,22 @@ const MeetupDetails = ({ meetupData }) => {
 // You only need this function if your using getStaticProps and its a dynamic page
 export async function getStaticPaths() {
 	// you would get your id's from a database then render these params dynamically
+	const client = await MongoClient.connect(
+		`mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASS}@nextjs-practice.7mziiho.mongodb.net/?retryWrites=true&w=majority`
+	);
+
+	const db = client.db();
+	const collection = db.collection('meetups');
+	const meetups = await collection.find({}, { _id: 1 }).toArray();
+
 	return {
 		// fallback to false will render 404 if a user went to /m5.
 		// if fallback was set to true, it would render the /m5 even if the path isnt defined. So, if you have 100s of pages, you can set your most popular pages in the paths array for fast loading, then render the other pages once the user requests the path
 
 		fallback: true,
-		paths: [
-			{
-				params: {
-					meetupId: 'm1',
-				},
-			},
-			{
-				params: {
-					meetupId: 'm2',
-				},
-			},
-			{
-				params: {
-					meetupId: 'm3',
-				},
-			},
-			{
-				params: {
-					meetupId: 'm4',
-				},
-			},
-		],
+		paths: meetups.map((meetup) => ({
+			params: { meetupId: meetup._id.toString() },
+		})),
 	};
 }
 
