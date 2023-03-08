@@ -1,19 +1,16 @@
 import { useRouter } from 'next/router';
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import styles from '../styles/MeetupDetails.module.css';
 
 const MeetupDetails = ({ meetupData }) => {
-	let { id } = meetupData;
+	console.log(meetupData);
 	return (
 		<section className={styles.detailParent}>
-			<img
-				src="https://static01.nyt.com/images/2022/12/20/science/16tb-cinnamon-bear/16tb-cinnamon-bear-articleLarge.jpg?quality=75&auto=webp"
-				alt="a bear sitting down"
-			/>
-			<h1>First Meetup</h1>
-			<span> ID: {id}</span>
-			<address>wow an addy</address>
-			<p>Description</p>
+			<img src={meetupData.image} />
+			<h1>{meetupData.title}</h1>
+			<span> ID: {meetupData.id}</span>
+			<address>{meetupData.address}</address>
+			<p>{meetupData.description}</p>
 		</section>
 	);
 };
@@ -28,7 +25,7 @@ export async function getStaticPaths() {
 	const db = client.db();
 	const collection = db.collection('meetups');
 	const meetups = await collection.find({}, { _id: 1 }).toArray();
-
+	client.close();
 	return {
 		// fallback to false will render 404 if a user went to /m5.
 		// if fallback was set to true, it would render the /m5 even if the path isnt defined. So, if you have 100s of pages, you can set your most popular pages in the paths array for fast loading, then render the other pages once the user requests the path
@@ -44,15 +41,26 @@ export async function getStaticProps(context) {
 	// fetch data for single meetup
 
 	let meetupId = context.params.meetupId;
+	console.log('MEETUP ID', meetupId);
+	const client = await MongoClient.connect(
+		`mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASS}@nextjs-practice.7mziiho.mongodb.net/?retryWrites=true&w=majority`
+	);
+
+	const db = client.db();
+	const collection = db.collection('meetups');
+	const selectedMeetup = await collection.findOne({
+		_id: new ObjectId(meetupId),
+	});
+	client.close();
 
 	return {
 		props: {
 			meetupData: {
-				id: meetupId,
-				image: 'https://static01.nyt.com/images/2022/12/20/science/16tb-cinnamon-bear/16tb-cinnamon-bear-articleLarge.jpg?quality=75&auto=webp',
-				title: 'First Meetup',
-				address: 'wow an addy',
-				description: 'Description',
+				id: selectedMeetup._id.toString(),
+				title: selectedMeetup.title,
+				address: selectedMeetup.address,
+				image: selectedMeetup.image,
+				description: selectedMeetup.description,
 			},
 		},
 	};
