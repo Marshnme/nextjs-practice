@@ -1,17 +1,27 @@
 import { useRouter } from 'next/router';
 import { MongoClient, ObjectId } from 'mongodb';
+import Head from 'next/head';
 import styles from '../styles/MeetupDetails.module.css';
 
 const MeetupDetails = ({ meetupData }) => {
 	console.log(meetupData);
 	return (
-		<section className={styles.detailParent}>
-			<img src={meetupData.image} />
-			<h1>{meetupData.title}</h1>
-			<span> ID: {meetupData.id}</span>
-			<address>{meetupData.address}</address>
-			<p>{meetupData.description}</p>
-		</section>
+		<>
+			<Head>
+				<title>{meetupData.title}</title>
+				<meta
+					name="description"
+					content={meetupData.description}
+				></meta>
+			</Head>
+			<section className={styles.detailParent}>
+				<img src={meetupData.image} />
+				<h1>{meetupData.title}</h1>
+				<span> ID: {meetupData.id}</span>
+				<address>{meetupData.address}</address>
+				<p>{meetupData.description}</p>
+			</section>
+		</>
 	);
 };
 
