@@ -40,7 +40,9 @@ export async function getStaticPaths() {
 		// fallback to false will render 404 if a user went to /m5.
 		// if fallback was set to true, it would render the /m5 even if the path isnt defined. So, if you have 100s of pages, you can set your most popular pages in the paths array for fast loading, then render the other pages once the user requests the path
 
-		fallback: true,
+		// blocking doesnt show the user anything until the page is prerendered and served.
+		// True requires you to handle the 'loading' of a blank screen while data is being served
+		fallback: 'blocking',
 		paths: meetups.map((meetup) => ({
 			params: { meetupId: meetup._id.toString() },
 		})),
